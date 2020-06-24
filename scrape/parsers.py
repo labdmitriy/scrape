@@ -1,4 +1,5 @@
 import re
+from functools import partial
 from typing import List, Dict, Tuple, Set
 from time import sleep
 from urllib.parse import urlparse
@@ -78,7 +79,7 @@ def filter_urls(
     results = filter(lambda x: x['is_valid'] is is_valid
                      and x['domain'] == domain,
                      valid_results)
-    urls = set(list(map(lambda x: x['url'], results)))
+    urls = set(map(lambda x: x['url'], results))
     return urls
 
 
@@ -117,6 +118,7 @@ def get_domain(url: str, levels: int = 2) -> str:
 
 
 def get_views_count(url: str, sleep_time: int = 1) -> Dict:
+    print(url, sleep_time)
     parse_results: Dict = {}
     parse_results['url'] = url
     parse_results['is_parsed'] = False
@@ -158,9 +160,18 @@ def get_views_count(url: str, sleep_time: int = 1) -> Dict:
     return parse_results
 
 
-def get_domain_counts(valid_results: List, domain: str) -> List:
+def get_domain_counts(
+    valid_results: List,
+    domain: str,
+    sleep_time: int
+) -> List:
     domain_urls = filter_urls(valid_results, domain)
-    return list(map(get_views_count, domain_urls))
+    get_views_count_with_sleep = partial(
+        get_views_count,
+        sleep_time=sleep_time
+    )
+
+    return list(map(get_views_count_with_sleep, domain_urls))
 
 
 DOMAIN_PARSERS: Dict = {

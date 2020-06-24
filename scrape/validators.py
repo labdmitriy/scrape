@@ -9,7 +9,7 @@ from merch.db import PostgresDB
 class URLValidator:
     def __init__(
         self,
-        domains: Iterable,
+        domains: List,
         blacklist_conn_id: str,
         blacklist_query: str
     ) -> None:
