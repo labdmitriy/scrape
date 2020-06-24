@@ -34,9 +34,14 @@ class URLValidator:
         else:
             return False
 
-    def _is_correct_domain(self, url: str) -> bool:
+    @staticmethod
+    def _get_domain(url: str, levels: int = 2) -> str:
         netloc = urlparse(url).netloc
-        domain = '.'.join(netloc.split('.')[-2:]).lower()
+        domain = '.'.join(netloc.split('.')[-levels:]).lower()
+        return domain
+
+    def _is_correct_domain(self, url: str) -> bool:
+        domain = self._get_domain(url)
 
         if domain in self.domains:
             return True
@@ -57,6 +62,7 @@ class URLValidator:
         validation_result: Dict = {}
         validation_result['url'] = url
         validation_result['is_valid'] = False
+        validation_result['domain'] = self._get_domain(url)
 
         if not self._is_correct_url(url):
             validation_result['error_code'] = 'incorrect_url'

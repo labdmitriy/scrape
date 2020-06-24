@@ -1,20 +1,17 @@
-from typing import Iterable, List
+from typing import Iterable, List, Dict
 
 import gspread
-from airflow.models.variable import Variable
 from oauth2client.service_account import ServiceAccountCredentials as sac
 
 
 class GoogleSheet:
-    def __init__(self, key_name: str) -> None:
-        self.secret_key = Variable.get(key_name, deserialize_json=True)
+    def __init__(self, google_secret_key: Dict) -> None:
+        self.google_secret_key = google_secret_key
 
-    def get_sheet(self, sheet_url_name: str) -> None:
-        google_sheet_url = Variable.get(sheet_url_name)
-
+    def get_sheet(self, google_sheet_url: str) -> None:
         scope = ['https://spreadsheets.google.com/feeds',
                  'https://www.googleapis.com/auth/drive']
-        creds = sac.from_json_keyfile_dict(self.secret_key, scope)
+        creds = sac.from_json_keyfile_dict(self.google_secret_key, scope)
         client = gspread.authorize(creds)
 
         self.sheet = client.open_by_url(google_sheet_url).sheet1
