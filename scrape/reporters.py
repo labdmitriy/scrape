@@ -38,7 +38,7 @@ def calculate_processing_stats(
 
 def generate_report(
     processing_stats: List,
-    url_errors_path: Path
+    error_stats_path: Path
 ) -> str:
     parsed_urls = list(filter(lambda x: x['is_parsed'] is True,
                               processing_stats))
@@ -55,7 +55,7 @@ def generate_report(
     summary_message += f'Parsed URLs count: {len(parsed_urls)}\n\n'
     summary_message += f'Errors\n\n{errors_stats_message}'
 
-    with open(url_errors_path, 'w') as f:
+    with open(error_stats_path, 'w') as f:
         fieldnames = ['row_num', 'url', 'value']
         writer = DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
         writer.writeheader()
