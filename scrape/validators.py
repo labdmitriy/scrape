@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, List, Dict
+from typing import List, Dict
 from urllib.parse import urlparse
 from operator import itemgetter
 
@@ -11,12 +11,16 @@ class URLValidator:
         self,
         domains: List,
         blacklist_conn_id: str,
-        blacklist_query: str
+        blacklist_query: str,
+        target_table: Dict,
+        temp_table: Dict
     ) -> None:
         self.domains = domains
         self.blacklist = self._get_blacklist(
             blacklist_conn_id,
-            blacklist_query
+            blacklist_query,
+            target_table,
+            temp_table
         )
 
     @staticmethod
@@ -51,9 +55,15 @@ class URLValidator:
     def _get_blacklist(
         self,
         blacklist_conn_id: str,
-        blacklist_query: str
+        blacklist_query: str,
+        target_table: Dict,
+        temp_table: Dict
     ) -> List:
         pg_db = PostgresDB(blacklist_conn_id)
+        pg_db.drop_table(temp_table['table_name'])
+        pg_db.create_table(temp_table)
+        pg_db.create_table(target_table)
+
         get_url = itemgetter(0)
         blacklist = list(map(get_url, pg_db.query(blacklist_query)))
         return blacklist
